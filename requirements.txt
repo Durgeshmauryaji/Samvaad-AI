@@ -27,3 +27,4 @@ pypdf
 beautifulsoup4 
 langchain-text-splitters
 langchain-chroma
+pip install pyrebase4
