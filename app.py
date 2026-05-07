@@ -49,7 +49,7 @@ db = firebase.database()
 
 
 
-# Auth Functions (ADD HERE)
+# Auth Functions 
 def signup(email, password):
     try:
         user = auth.create_user_with_email_and_password(email, password)
@@ -66,11 +66,10 @@ def login(email, password):
     except Exception as e: 
         print(e)         
         return None
-# ---------------- SESSION THREAD ----------------   
+#-SESSION THREAD -
 thread_id = st.session_state.get("user_id", "guest")
 
-# ---------------- CHAT FUNCTIONS ----------------
-
+# - CHAT FUNCTIONS -
 def create_new_chat():
 
     chat_id = str(uuid.uuid4())
@@ -111,7 +110,7 @@ def load_chat(chat_id):
 st.sidebar.title("🔐 Authentication")
 
 # if logged in  → then show Logout button and Chats
-# ---------------- IF USER LOGGED IN ----------------
+# ----- IF USER LOGGED IN ----
 
 if "user_id" in st.session_state:
 
@@ -125,12 +124,12 @@ if "user_id" in st.session_state:
         st.session_state.clear()
         st.rerun()
 
-    # ---------------- CHAT SIDEBAR ----------------
+    # - CHAT SIDEBAR -
 
     st.sidebar.markdown("---")
     st.sidebar.subheader("💬 Chats")
 
-    # ➕ New Chat
+    #  New Chat
     if st.sidebar.button("➕ New Chat"):
 
         create_new_chat()
@@ -170,7 +169,7 @@ if "user_id" in st.session_state:
                 st.rerun()
 
 
-# ❌ if not logged in → then show Login/Signup options
+# if not logged in → then show Login/Signup options
 else:
     
     choice = st.sidebar.selectbox("Choose", ["Login", "Signup"])
@@ -190,8 +189,16 @@ else:
                 user = signup(email.strip(), password.strip())
 
                 if user:
-                    st.session_state.name = name 
+                    # Auto Login After Signup
+                    login_user = login(email.strip(), password.strip())
+                    st.session_state.user = login_user
+                    st.session_state.user_id = login_user["localId"]
+                    st.session_state.name = name
+                    st.session_state.memory = InMemorySaver()
+                    st.session_state.history = []
+                    st.session_state.chat_id = None
                     st.sidebar.success("Account created successfully ✅")
+                    st.rerun()
                 else:
                     st.sidebar.error("Signup failed or User Exists ❌")
 
@@ -218,12 +225,12 @@ else:
                     st.sidebar.error("Invalid email or password ❌")
                 
 
-# 🔐 Protect chatbot (ADD THIS)
+# Protect chatbot 
 if "user_id" not in st.session_state:
     st.warning("Please login to use Samvaad AI 🔐")
     st.stop()
     
-# ---------------- AUTO CREATE FIRST CHAT ----------------
+# ---- AUTO CREATE FIRST CHAT -
 
 if "chat_id" not in st.session_state or st.session_state.chat_id is None:
     create_new_chat()
@@ -237,11 +244,10 @@ llm = ChatGroq(
 
 search=GoogleSerperAPIWrapper() # Initialize the Google Search API Wrapper
 tool=[search.run] # Define the tools to be used by the agent
-# memory=InMemorySaver() # Initialize the InMemorySaver to save the conversation history in memory
 
 
 
-# ---------------- MEMORY ----------------
+# --- MEMORY ---
 
 if "memory" not in st.session_state:
 
@@ -252,7 +258,7 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 
-# ---------------- AGENT ----------------
+#-- AGENT ----
 agent=create_agent(
     model=llm,  
     tools=tool,
@@ -279,7 +285,6 @@ Use Google Search only for factual, latest, or real-time information questions.
     checkpointer=st.session_state.memory # Pass the memory object to the agent to save the conversation history
 )
 
-# print(st.session_state.memory) #for showing address of memory
 
 # Building Web Interface using Streamlit
 
@@ -307,7 +312,7 @@ if query:
         "content": query
     })
 
-    # ---------------- AUTO TITLE ----------------
+    # --- AUTO TITLE --
 
     if len(st.session_state.history) == 1:
 
@@ -321,7 +326,7 @@ if query:
                 "title": title
             })
 
-    # ---------------- SAVE USER MESSAGE ----------------
+    # -- SAVE USER MESSAGE ---
 
     db.child("users") \
         .child(thread_id) \
@@ -355,8 +360,7 @@ if query:
         space.markdown(message)  # final clean text
 
     
-    # ---------------- SAVE ASSISTANT MESSAGE ----------------
-
+    # ------SAVE ASSISTANT MESSAGE -
     st.session_state.history.append({
         "role": "assistant",
         "content": message
