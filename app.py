@@ -292,6 +292,7 @@ st.markdown(
     "<h2 style='text-align:center; color:#4B0082;'>⚡Samvaad AI - Answer at the speed of thought</h2>",
     unsafe_allow_html=True
 )
+st.image("icon.png", width=200)
 
 
 for message in st.session_state.history:
