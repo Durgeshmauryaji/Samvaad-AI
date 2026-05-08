@@ -26,7 +26,7 @@ import os
 
 st.set_page_config(
     page_title="Samvaad AI - Your Personal ChatGPT",
-    page_icon="icon.png",
+    page_icon="icon.webp",
     layout="wide"
 )
 
@@ -227,7 +227,14 @@ else:
 
 # Protect chatbot 
 if "user_id" not in st.session_state:
-    st.warning("Please login to use Samvaad AI 🔐")
+    
+    st.warning("👈 Please login to use Samvaad AI 🔐")
+    
+    col1, col2, col3 = st.columns([1,2,1])
+    
+    with col2:
+        st.image("icon.png", width=500)
+    
     st.stop()
     
 # ---- AUTO CREATE FIRST CHAT -
@@ -287,12 +294,34 @@ Use Google Search only for factual, latest, or real-time information questions.
 
 
 # Building Web Interface using Streamlit
-
 st.markdown(
-    "<h2 style='text-align:center; color:#4B0082;'>⚡Samvaad AI - Answer at the speed of thought</h2>",
+    """
+    <style>
+    .block-container {
+        padding-top: 0.5rem;
+    }
+
+    div[data-testid="stImage"] {
+        margin-bottom: -10px;
+    }
+    </style>
+    """,
     unsafe_allow_html=True
 )
+
 st.image("icon.png", width=200)
+
+st.markdown(
+    """
+    <h2 style='text-align:center; color:#4B0082; margin-top:-5px; margin-bottom:0px;'>
+        ⚡ Samvaad AI - Answer at the speed of thought
+    </h2>
+    """,
+    unsafe_allow_html=True
+)
+
+
+
 
 
 for message in st.session_state.history:
@@ -320,7 +349,7 @@ if query and any(word in query.lower() for word in developer_keywords):
         "I was developed by Durgesh Kumar 👨‍💻"
     )
 
-    st.image("developer.png", use_container_width=True)
+    st.image("developer.png", width=250)
 
     st.stop()
 
