@@ -319,7 +319,7 @@ if query and any(word in query.lower() for word in developer_keywords):
         "I was developed by Durgesh Kumar 👨‍💻"
     )
 
-    st.image("developer.jpeg", use_container_width=True)
+    st.image("developer.png", use_container_width=True)
 
     st.stop()
 
